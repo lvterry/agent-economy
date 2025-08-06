@@ -1,0 +1,21 @@
+general:
+  - name: "General Agent 1"
+    image: "/assets/images/general1.jpg"
+    url: "https://example.com/general1"
+  - name: "General Agent 2"
+    image: "/assets/images/general2.jpg"
+    url: "https://example.com/general2"
+finance:
+  - name: "Finance Agent 1"
+    image: "/assets/images/finance1.jpg"
+    url: "https://example.com/finance1"
+  - name: "Finance Agent 2"
+    image: "/assets/images/finance2.jpg"
+    url: "https://example.com/finance2"
+coding:
+  - name: "Coding Agent 1"
+    image: "/assets/images/coding1.jpg"
+    url: "https://example.com/coding1"
+  - name: "Coding Agent 2"
+    image: "/assets/images/coding2.jpg"
+    url: "https://example.com/coding2"
