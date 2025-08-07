@@ -3,6 +3,8 @@ general:
     url: "https://manus.im"
   - name: "Genspark"
     url: "https://genspark.ai"
+  - name: "ChatGPT Agent"
+    url: "https://openai.com/index/introducing-chatgpt-agent/"
 finance:
   - name: "Bobby"
     url: "https://bobby.finance"
