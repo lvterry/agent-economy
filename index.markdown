@@ -2,7 +2,7 @@
 # Feel free to add content and custom Front Matter to this file.
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
-layout: home
+layout: default
 ---
 
 <h1>Agent Catalog</h1>
@@ -11,8 +11,7 @@ layout: home
 <ul>
 {% for agent in site.data.agents.general %}
   <li>
-    <img src="{{ agent.image }}" alt="{{ agent.name }}" style="width: 100px; height: auto;">
-    <a href="{{ agent.url }}">{{ agent.name }}</a>
+    <a href="{{ agent.url }}" target="_blank">{{ agent.name }}</a>
   </li>
 {% endfor %}
 </ul>
@@ -21,8 +20,7 @@ layout: home
 <ul>
 {% for agent in site.data.agents.finance %}
   <li>
-    <img src="{{ agent.image }}" alt="{{ agent.name }}" style="width: 100px; height: auto;">
-    <a href="{{ agent.url }}">{{ agent.name }}</a>
+    <a href="{{ agent.url }}" target="_blank">{{ agent.name }}</a>
   </li>
 {% endfor %}
 </ul>
@@ -31,8 +29,7 @@ layout: home
 <ul>
 {% for agent in site.data.agents.coding %}
   <li>
-    <img src="{{ agent.image }}" alt="{{ agent.name }}" style="width: 100px; height: auto;">
-    <a href="{{ agent.url }}">{{ agent.name }}</a>
+    <a href="{{ agent.url }}" target="_blank">{{ agent.name }}</a>
   </li>
 {% endfor %}
 </ul>
