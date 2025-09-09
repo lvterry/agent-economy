@@ -30,9 +30,9 @@ llm = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
 system_prompt = "You are a helpful assitant. You answer in a clear and concise way. If you don't know the anwser, say you don't know."
 
-user_prompt = "What are the top 3 AI labs in the US?"
+user_prompt = "What's the most valuable tech company in 2025?"
 
-print("-" * 10)
+print("-" * 20)
 print(f"Question: { user_prompt }")
 
 response = llm.chat.completions.create(
@@ -48,7 +48,7 @@ answer = response.choices[0].message.content
 
 print(f"\nAnswer: { answer }")
 
-print("-" * 10)
+print("-" * 20)
 
 judge_prompt = """
 You are a strict critic. 
@@ -74,4 +74,4 @@ judge = llm.chat.completions.create(
 
 judge_output_raw = judge.choices[0].message.content
 is_full_answer = parse_is_full_answer(judge_output_raw)
-print(is_full_answer)
+print("LLM judge: 👍" if is_full_answer else "LLM judge: 👎")
