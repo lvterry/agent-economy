@@ -3,6 +3,7 @@ import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Card, CardHeader, CardContent } from './components/ui/card'
 import { ScrollArea } from './components/ui/scroll-area'
+import Markdown from './components/Markdown'
 
 type EventItem =
   | { type: 'start' }
@@ -95,7 +96,7 @@ export default function App() {
                 {messages.map((m, i) => (
                   <div key={i} className="space-y-1">
                     <div className="text-xs text-gray-500">{m.role === 'user' ? 'You' : 'Assistant'}</div>
-                    <div className="whitespace-pre-wrap">{m.content}</div>
+                    <Markdown>{m.content}</Markdown>
                   </div>
                 ))}
 
@@ -114,7 +115,7 @@ export default function App() {
                 {output && (
                   <div className="space-y-1">
                     <div className="text-xs text-gray-500">Assistant</div>
-                    <div className="whitespace-pre-wrap">{output}</div>
+                    <Markdown>{output}</Markdown>
                   </div>
                 )}
 
