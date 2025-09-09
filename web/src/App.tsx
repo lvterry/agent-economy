@@ -108,7 +108,7 @@ export default function App() {
       <div className="mx-auto max-w-3xl p-4 space-y-4">
         <h1 className="text-xl font-semibold">LLM Tools Demo</h1>
         <Card>
-          <CardHeader className="pb-2 flex items-center justify-between">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
             <div>Chat</div>
             <Button
               variant="ghost"
