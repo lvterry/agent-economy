@@ -4,6 +4,7 @@ import { Input } from './components/ui/input'
 import { Card, CardHeader, CardContent } from './components/ui/card'
 import { ScrollArea } from './components/ui/scroll-area'
 import Markdown from './components/Markdown'
+import { Trash2 } from 'lucide-react'
 
 type EventItem =
   | { type: 'start' }
@@ -18,6 +19,7 @@ function useChatStream() {
   const [events, setEvents] = useState<EventItem[]>([])
   const [output, setOutput] = useState('')
   const controllerRef = useRef<AbortController | null>(null)
+  const [loading, setLoading] = useState(false)
 
   const start = useCallback(async (message: string) => {
     controllerRef.current?.abort()
@@ -25,6 +27,7 @@ function useChatStream() {
     controllerRef.current = controller
     setEvents([])
     setOutput('')
+    setLoading(true)
 
     const resp = await fetch('/api/chat/stream', {
       method: 'POST',
@@ -49,25 +52,41 @@ function useChatStream() {
         try {
           const evt: EventItem = JSON.parse(line)
           setEvents(prev => [...prev, evt])
-          if (evt.type === 'content_delta') setOutput(prev => prev + (evt.text || ''))
+          // Only hide when first displayable assistant text arrives
+          if (evt.type === 'content_delta' && evt.text) {
+            setLoading(false)
+            setOutput(prev => prev + (evt.text || ''))
+          } else if (evt.type === 'content_delta') {
+            // ensure we accumulate even empty chunks without hiding
+            setOutput(prev => prev + (evt.text || ''))
+          }
         } catch {
           // ignore parse errors
         }
       }
     }
+    setLoading(false)
   }, [])
 
   const stop = useCallback(() => {
     controllerRef.current?.abort()
+    setLoading(false)
   }, [])
 
-  return { events, output, start, stop }
+  const reset = useCallback(() => {
+    controllerRef.current?.abort()
+    setEvents([])
+    setOutput('')
+    setLoading(false)
+  }, [])
+
+  return { events, output, start, stop, reset, loading }
 }
 
 export default function App() {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const { events, output, start } = useChatStream()
+  const { events, output, start, reset, loading } = useChatStream()
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -89,7 +108,21 @@ export default function App() {
       <div className="mx-auto max-w-3xl p-4 space-y-4">
         <h1 className="text-xl font-semibold">LLM Tools Demo</h1>
         <Card>
-          <CardHeader className="pb-2">Chat</CardHeader>
+          <CardHeader className="pb-2 flex items-center justify-between">
+            <div>Chat</div>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Clear chat"
+              title="Clear chat"
+              onClick={() => {
+                reset()
+                setMessages([])
+              }}
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
+          </CardHeader>
           <CardContent>
             <ScrollArea className="h-[50vh] w-full overflow-auto border rounded-md bg-white">
               <div className="p-4 space-y-4">
@@ -116,6 +149,13 @@ export default function App() {
                   <div className="space-y-1">
                     <div className="text-xs text-gray-500">Assistant</div>
                     <Markdown>{output}</Markdown>
+                  </div>
+                )}
+
+                {loading && (
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-700" />
+                    <span>Waiting for server…</span>
                   </div>
                 )}
 
