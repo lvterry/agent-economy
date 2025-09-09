@@ -75,8 +75,10 @@ export default function App() {
 
   const onSend = useCallback(() => {
     if (!input.trim()) return
-    setMessages(prev => [...prev, { role: 'user', content: input }])
-    start(input)
+    const msg = input
+    setMessages(prev => [...prev, { role: 'user', content: msg }])
+    setInput("")
+    start(msg)
   }, [input, start])
 
   const toolEvents = useMemo(() => events.filter(e => e.type === 'tool_call' || e.type === 'tool_result'), [events])
@@ -135,4 +137,3 @@ export default function App() {
     </div>
   )
 }
-
