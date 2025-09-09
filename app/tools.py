@@ -203,6 +203,23 @@ tools = [
             },
         }
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "bocha_search",
+            "description": "Search the web using Bocha Web Search and return a list of results.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Search query to look up on the web",
+                    }
+                },
+                "required": ["query"]
+            },
+        }
+    },
 ]
 
 def send_messages(messages):
@@ -256,6 +273,18 @@ def run_with_tools(user_content: str, *, verbose: bool = False):
             if fn_name == "get_weather":
                 location = args.get("location")
                 tool_output = get_weather(location) if location else ""
+            elif fn_name == "bocha_search":
+                query = args.get("query")
+                if query:
+                    try:
+                        results = bocha_search(query)
+                        # Keep payload compact: limit to first 5 results
+                        preview = results[:5] if isinstance(results, list) else results
+                        tool_output = json.dumps(preview, ensure_ascii=False)
+                    except Exception as e:
+                        tool_output = json.dumps({"error": str(e)})
+                else:
+                    tool_output = json.dumps({"error": "missing query"})
             else:
                 tool_output = f"Unsupported tool: {fn_name}"
 
