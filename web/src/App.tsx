@@ -65,7 +65,7 @@ function useChatStream() {
 }
 
 export default function App() {
-  const [input, setInput] = useState('How\'s the weather in Hangzhou?')
+  const [input, setInput] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const { events, output, start } = useChatStream()
   const endRef = useRef<HTMLDivElement>(null)
