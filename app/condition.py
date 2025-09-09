@@ -7,6 +7,21 @@ from openai import OpenAI
 # Load environment variables from .env
 load_dotenv()
 
+
+def parse_is_full_answer(text: str) -> bool:
+    try:
+        data = json.loads(text or "{}")
+    except Exception:
+        return False
+    value = data.get("is_full_answer")
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"true", "yes", "1"}
+    if isinstance(value, (int, float)):
+        return bool(value)
+    return False
+
 api_key = os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_KEY")
 if not api_key:
     raise RuntimeError("API key missing.")
@@ -15,7 +30,7 @@ llm = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
 system_prompt = "You are a helpful assitant. You answer in a clear and concise way. If you don't know the anwser, say you don't know."
 
-user_prompt = "What is the average wing speed of a swallow?"
+user_prompt = "What are the top 3 AI labs in the US?"
 
 print("-" * 10)
 print(f"Question: { user_prompt }")
@@ -58,23 +73,5 @@ judge = llm.chat.completions.create(
 )
 
 judge_output_raw = judge.choices[0].message.content
-
-# Parse judge output to boolean
-is_full_answer = False
-try:
-    data = json.loads(judge_output_raw or "{}")
-    value = data.get("is_full_answer")
-    if isinstance(value, bool):
-        is_full_answer = value
-    elif isinstance(value, str):
-        is_full_answer = value.strip().lower() in {"true", "yes", "1"}
-    elif isinstance(value, (int, float)):
-        is_full_answer = bool(value)
-except Exception:
-    # Keep default False if parsing fails
-    pass
-
-if is_full_answer:
-    print("LLM judge: 👍")
-else:
-    print("LLM judge: 👎")
+is_full_answer = parse_is_full_answer(judge_output_raw)
+print(is_full_answer)
