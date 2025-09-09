@@ -7,3 +7,19 @@ dist/
 build/
 *.egg-info/
 .env
+
+# Frontend/node
+node_modules/
+web/node_modules/
+web/dist/
+web/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+*.swo

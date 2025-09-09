@@ -15,3 +15,23 @@ Environment
 - Create `.env` at project root with: `OPENAI_KEY=your-key-here`
 - `.env` is gitignored.
 - The app loads `.env` in `app/main.py` and uses `OPENAI_KEY`.
+
+Web demo
+
+- Backend (FastAPI)
+  - Run: `uvicorn server.main:app --reload --port 8000`
+
+- Frontend (React + Tailwind)
+  - cd `web`
+  - Install deps: `npm install` or `pnpm install`
+  - Dev: `npm run dev` (Vite proxy forwards `/api` to `http://localhost:8000`)
+
+Streaming API
+
+- Endpoint: `POST /api/chat/stream`
+- Body: `{ "message": "..." }`
+- Response: NDJSON lines with events
+  - `{ "type": "tool_call", "name": "...", "args": {...} }`
+  - `{ "type": "tool_result", "name": "...", "result": "..." }`
+  - `{ "type": "content_delta", "text": "..." }`
+  - `{ "type": "done" }`

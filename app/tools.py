@@ -9,9 +9,9 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
-api_key = os.getenv("DEEPSEEK_API_KEY")
+api_key = os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_KEY")
 if not api_key:
-    raise RuntimeError("Error: DeepSeek API key missing.")
+    raise RuntimeError("Error: DeepSeek/OpenAI API key missing.")
 
 client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
