@@ -6,7 +6,14 @@ import traceback
 
 import requests
 from dotenv import load_dotenv
+from openai import OpenAI
 
+load_dotenv()
+api_key = os.getenv("DEEPSEEK_API_KEY")
+if not api_key:
+    raise RuntimeError("Error: DeepSeek API key missing.")
+
+client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
 def _mask_token(token: Optional[str]) -> str:
     if not token:
@@ -178,8 +185,93 @@ def test_bocha_search(query: str = "天空为什么是蓝色的？", *, verbose:
         print(json.dumps(preview, ensure_ascii=False, indent=2))
     return results
 
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get weather of a location, the user should supply a location first.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "The city and state, e.g. San Francisco, CA",
+                    }
+                },
+                "required": ["location"]
+            },
+        }
+    },
+]
+
+def send_messages(messages):
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=messages,
+        tools=tools,
+        tool_choice="auto",
+    )
+    return response.choices[0].message
+
+def get_weather(location: str) -> str:
+    if location == "Hangzhou":
+        return "38 degrees"
+    else:
+        return "100 degrees"
+
+def run_with_tools(user_content: str, *, verbose: bool = False):
+    messages = [{"role": "user", "content": user_content}]
+    if verbose:
+        print(f"User > {user_content}")
+
+    # Limit number of tool-call rounds to avoid infinite loops
+    for _ in range(5):
+        message = send_messages(messages)
+        messages.append({
+            "role": message.role,
+            "content": message.content,
+            # include tool_calls if present so the model can see its own call history
+            **({"tool_calls": message.tool_calls} if getattr(message, "tool_calls", None) else {}),
+        })
+
+        tool_calls = getattr(message, "tool_calls", None)
+        if not tool_calls:
+            # No tool call; final answer
+            if verbose:
+                print(f"Model > {message.content}")
+            return message.content
+
+        # Execute each tool call and append tool results
+        for tool_call in tool_calls:
+            fn_name = tool_call.function.name
+            try:
+                args = json.loads(tool_call.function.arguments or "{}")
+            except Exception:
+                args = {}
+            if verbose:
+                print(f"[tools] calling {fn_name} with args: {args}")
+
+            tool_output = ""
+            if fn_name == "get_weather":
+                location = args.get("location")
+                tool_output = get_weather(location) if location else ""
+            else:
+                tool_output = f"Unsupported tool: {fn_name}"
+
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": str(tool_output),
+            })
+
+    # If loop exits without returning
+    if verbose:
+        print("[tools] Reached max tool rounds without final content.")
+    return None
+
 
 if __name__ == "__main__":
-    # Allow quick CLI testing: python app/tools.py "your query"
-    q = sys.argv[1] if len(sys.argv) > 1 else "天空为什么是蓝色的？"
-    test_bocha_search(q)
+    # Demo: run a prompt that should trigger the get_weather tool
+    query = sys.argv[1] if len(sys.argv) > 1 else "How's the weather in Hangzhou?"
+    run_with_tools(query, verbose=True)
