@@ -116,15 +116,11 @@ def chatbot(user_prompt: str):
 
 def chatbot_with_tools(user_prompt: str):
     user_prompt = "杭州天气怎么样" if not user_prompt else user_prompt
-    system_prompt = "You are a helpful assistant. You answer in a clear and concise way. Match your output language with user's question."
+    # system_prompt = "You are a helpful assistant. You answer in a clear and concise way. Match your output language with user's question."
     messages = [{
-        "role": "system",
-        "content": system_prompt
-    }]
-    messages.append({
         "role": "user",
         "content": user_prompt
-    })
+    }]
 
     print("-" * 30)
     print("User > " + user_prompt)

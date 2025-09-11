@@ -48,10 +48,6 @@ def bocha_search(query: str) -> str:
         resp = requests.post(url, json=payload, headers=headers, timeout=30)
         resp.raise_for_status()
         
-        #ct = resp.headers.get("content-type", "")
-        #print("[bocha_search] Status:", resp.status_code)
-        #print("[bocha_search] Content-Type:", ct)
-        
         # Try json first; if it fails, print raw text for debugging.
         try:
             data = _extract_webpages(resp.json())
@@ -92,23 +88,20 @@ def run_tool(fn_name, args):
         query = args.get("query")
         if query:
             try:
-                results = bocha_search(query)
-                # Keep payload compact: limit to first 5 results
-                preview = results[:5] if isinstance(results, list) else results
-                tool_output = json.dumps(preview, ensure_ascii=False)
+                tool_output = bocha_search(query)
             except Exception as e:
-                tool_output = json.dumps({"error": str(e)})
+                tool_output = f"[bocha_search] error: { str(e) }"
         else:
-            tool_output = json.dumps({"error": "bocha_search: missing query"})
+            tool_output = f"[bocha_search] error: Missing query"
     elif fn_name == "fetch":
         url = args.get("url")
         if url:
             try:
                 tool_output = fetch(url)
             except Exception as e:
-                tool_output = json.dumps({"error": str(e)})
+                tool_output = f"[fetch] error: { str(e) }"
         else:
-            tool_output = json.dumps({"error": "fetcH: missing url"})
+            tool_output = f"[fetch] error: Missing url"
     else:
         tool_output = f"Unsupported tool: {fn_name}"
     
