@@ -235,7 +235,7 @@ def get_weather(location: str) -> str:
     if location == "Hangzhou":
         return "38 degrees"
     else:
-        return "100 degrees"
+        return "24 degrees"
 
 def run_with_tools(user_content: str, *, verbose: bool = False):
     messages = [{"role": "user", "content": user_content}]
